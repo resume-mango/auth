@@ -19,10 +19,11 @@ const csrfProtection = csrf({
   cookie: {
     key: 'CSRF-TOKEN',
     httpOnly: true,
-    secure: IN_PROD,
+    secure: IN_PROD || false,
     maxAge: 3600,
     path: '/',
-    domain: process.env.COOKIE_DOMAIN || 'localhost',
+    domain: IN_PROD ? process.env.COOKIE_DOMAIN : 'localhost',
+    sameSite: 'lax',
   },
 })
 
@@ -56,7 +57,14 @@ if (!IN_STAGING) {
   app.use(csrfProtection)
   app.use((req, res, next) => {
     const token = req.csrfToken()
-    res.cookie('XSRF-TOKEN', token)
+    res.cookie('XSRF-TOKEN', token, {
+      httpOnly: true,
+      secure: IN_PROD || false,
+      maxAge: 3600,
+      path: '/',
+      domain: IN_PROD ? process.env.COOKIE_DOMAIN : 'localhost',
+      sameSite: 'lax',
+    })
     res.locals.csrfToken = token
     next()
   })
