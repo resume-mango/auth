@@ -33,7 +33,7 @@ export default {
       res.oidc.logout({ returnTo: process.env.BASE_HOST })
       res.clearCookie('rm_ia', {
         path: '/',
-        domain: process.env.AUTH0_COOKIE_DOMAIN,
+        domain: process.env.COOKIE_DOMAIN,
       })
     } catch (err) {
       next(err)

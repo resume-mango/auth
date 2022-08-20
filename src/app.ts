@@ -20,7 +20,9 @@ const csrfProtection = csrf({
     key: 'CSRF-TOKEN',
     httpOnly: true,
     secure: IN_PROD,
-    maxAge: 3600, //
+    maxAge: 3600,
+    path: '/',
+    domain: process.env.COOKIE_DOMAIN || 'localhost',
   },
 })
 
@@ -95,7 +97,7 @@ const config: ConfigParams = {
     name: 'SID',
     store: new RedisStore({ client: redisClient }),
     cookie: {
-      domain: IN_PROD ? process.env.AUTH0_COOKIE_DOMAIN : 'localhost',
+      domain: IN_PROD ? process.env.COOKIE_DOMAIN : 'localhost',
       path: '/',
       transient: false,
       httpOnly: true,
@@ -107,7 +109,7 @@ const config: ConfigParams = {
     res.cookie('rm_ia', true, {
       expires: new Date(parseInt(session.expires_at) * 1000),
       path: '/',
-      domain: IN_PROD ? process.env.AUTH0_COOKIE_DOMAIN : 'localhost',
+      domain: IN_PROD ? process.env.COOKIE_DOMAIN : 'localhost',
       sameSite: 'lax',
       secure: IN_PROD,
     })
