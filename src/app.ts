@@ -54,6 +54,8 @@ app.use(
   })
 )
 if (!IN_STAGING) {
+  app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'])
+
   app.use(csrfProtection)
   app.use((req, res, next) => {
     const token = req.csrfToken()
