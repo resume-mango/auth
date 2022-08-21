@@ -60,7 +60,6 @@ if (!IN_STAGING) {
   app.use((req, res, next) => {
     const token = req.csrfToken()
     res.cookie('XSRF-TOKEN', token, {
-      httpOnly: true,
       secure: IN_PROD || false,
       maxAge: 3600,
       path: '/',
