@@ -4,8 +4,13 @@ import { fakeUser } from '../../__mocks__/auth0User'
 
 describe('User Helper', () => {
   const namespace = process.env.AUTH0_RULES_NAMESPACE as any
-
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
   describe('Parse User', () => {
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
     test('should parse but no user metadata for auth0 sub', () => {
       const user: any = fakeUser()
       user[namespace].user_metadata = '' as any
@@ -42,6 +47,9 @@ describe('User Helper', () => {
     })
   })
   describe('Sync user sid token', () => {
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
     const mockedAxios = jest.mock('axios')
     const reqSpy = mockedAxios.spyOn(axios, 'request')
 
@@ -79,11 +87,15 @@ describe('User Helper', () => {
     })
   })
   describe('Update user ref', () => {
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
     const mockedAxios = jest.mock('axios')
     const reqSpy = mockedAxios.spyOn(axios, 'request')
     const SID = 'efg'
     const token = 'abc'
     const refresh = jest.fn().mockResolvedValue({ access_token: 'abc' })
+
     test('should fail', async () => {
       reqSpy.mockRejectedValue({ response: null } as any)
       const result = await updateUserRef(token, refresh, SID)
@@ -94,6 +106,7 @@ describe('User Helper', () => {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+          Cookie: 'SID=efg;',
         },
       })
       expect(result).toBe(null)
@@ -109,6 +122,7 @@ describe('User Helper', () => {
         headers: {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
+          Cookie: 'SID=efg;',
         },
       })
       expect(result).toEqual({ access_token: 'abc', ref: 'efg' })

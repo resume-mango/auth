@@ -10,13 +10,16 @@ export default {
     try {
       const path = req.query.rm_path?.toString()
       const host = req.query.rm_name?.toString()
-
+      const screen = req.query.screen?.toString() || ''
       const redirectUrl =
         host && path ? `/auth?rm_name=${host}&rm_path=${path}` : '/auth'
 
       res.oidc.login({
         returnTo: redirectUrl,
         silent: true,
+        authorizationParams: {
+          screen,
+        },
       })
     } catch (err) {
       next(err)

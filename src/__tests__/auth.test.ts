@@ -25,7 +25,13 @@ describe('Auth controller', () => {
       const next: any = jest.fn()
 
       await authController.login(req, res, next)
-      expect(res.oidc.login).toBeCalledWith({ returnTo: '/auth', silent: true })
+      expect(res.oidc.login).toBeCalledWith({
+        returnTo: '/auth',
+        silent: true,
+        authorizationParams: {
+          screen: '',
+        },
+      })
     })
     test('should redirect to "/auth?rm_name=app&rm_path=resume" endpoint', async () => {
       const req: any = {
@@ -45,6 +51,9 @@ describe('Auth controller', () => {
       expect(res.oidc.login).toBeCalledWith({
         returnTo: '/auth?rm_name=app&rm_path=/resume',
         silent: true,
+        authorizationParams: {
+          screen: '',
+        },
       })
     })
   })

@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 import createHttpError from 'http-errors'
 import { IN_PROD } from '../../../config/app'
 import { parseUser, syncToken, updateUserRef } from '../helpers/user'
-
+// import '../../../views/loader'
 export default {
   home: async (
     req: Request,
@@ -37,8 +37,9 @@ export default {
         }
         url = hostname + path
       }
-
       res.redirect(url as string)
+      // res.setHeader('Content-Security-Policy', "script-src 'unsafe-inline';")
+      // res.render('loader', { url })
     } catch (err) {
       next(err)
     }

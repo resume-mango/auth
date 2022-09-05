@@ -29,7 +29,7 @@ const csrfProtection = csrf({
 
 const RedisStore = connectRedis(auth) as any
 
-app.set('views', path.join(__dirname, 'views'))
+app.set('views', path.join(__dirname, '/views'))
 app.set('view engine', 'ejs')
 
 app.disable('x-powered-by')

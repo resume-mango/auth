@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Resume Mango</title>
   </head>
+
   <style>
     main {
       display: flex;
@@ -76,10 +77,15 @@
     }
   </style>
   <body>
+    <script>
+      document.addEventListener('DOMContentLoaded', function (event) {
+        console.log('Ready!')
+      })
+    </script>
     <main>
       <div class="wrapper">
         <div class="spinner"></div>
-        <p class="loading-dots"><%= text %></p>
+        <!-- <p class="loading-dots">Loading</p> -->
       </div>
     </main>
   </body>
