@@ -17,6 +17,7 @@ export default {
 
       const token = req.oidc.accessToken?.access_token
       const { SID } = req.cookies
+
       SID && (await syncToken(token as string, SID))
 
       if (path && host) {
