@@ -17,7 +17,6 @@ export default {
 
       const token = req.oidc.accessToken?.access_token
       const { SID } = req.cookies
-
       SID && (await syncToken(token as string, SID))
 
       if (path && host) {
@@ -75,11 +74,11 @@ export default {
       if (!token || !token_type) throw new createHttpError.Unauthorized()
 
       if (!userData.ref) {
-        const res = await updateUserRef(token, refresh, SID)
+        const response = await updateUserRef(token, refresh, SID)
 
-        if (res) {
-          token = res?.access_token
-          userData.ref = res.ref
+        if (response) {
+          token = response?.access_token
+          userData.ref = response.ref
         }
       }
       res.status(200)

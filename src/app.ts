@@ -122,7 +122,6 @@ const config: ConfigParams = {
       sameSite: 'lax',
       secure: IN_PROD,
     })
-
     return session
   },
 }

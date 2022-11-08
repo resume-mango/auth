@@ -3,10 +3,10 @@ import mainController from '../controllers/main'
 import authController from '../controllers/auth'
 
 import privateController from '../controllers/private'
-// import { requiresAuth } from 'express-openid-connect'
+import { requiresAuth } from 'express-openid-connect'
 
 const router = express.Router()
-router.get('/', mainController.home)
+router.get('/', requiresAuth(), mainController.home)
 router.get('/data', mainController.initialData)
 router.get('/refresh', mainController.refreshSession)
 router.get('/private/token', privateController.token)
