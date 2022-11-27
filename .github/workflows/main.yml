@@ -1,0 +1,36 @@
+name: Backend CI
+
+on:
+  push:
+    branches: ['main']
+
+  workflow_dispatch:
+
+# env:
+#   NEXT_PUBLIC_GOOGLE_ANALYTICS: ${{ secrets.NEXT_PUBLIC_GOOGLE_ANALYTICS }}
+
+jobs:
+  testing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 16.18.1
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.18.1
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Lints Project
+        run: npm run lint
+
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
+
+      - name: Tests Project
+        env:
+          NODE_OPTIONS: '--max_old_space_size=4096'
+        run: npm run test

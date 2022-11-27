@@ -6,12 +6,11 @@
   "scripts": {
     "start": "node ./build/bundle.js",
     "lint": "eslint . --ext .ts",
-    "dev1": "nodemon -r dotenv/config src/server.ts dotenv_config_path=./.env.development --exec ts-node src/server.ts",
-    "dev": "npm-run-all -p dev:build dev:watch",
+    "dev": "nodemon -r dotenv/config src/server.ts dotenv_config_path=./.env.development --exec ts-node src/server.ts",
     "dev:build": "webpack --config ./webpack/webpack.config.js --env NODE_ENV=development",
     "dev:watch": "nodemon ./build/bundle.js --watch build",
     "build": "webpack --config ./webpack/webpack.config.js --env NODE_ENV=production",
-    "test": "jest --coverage --forceExit --runInBand --silent",
+    "test": "jest --forceExit --runInBand --silent",
     "test:dev": "jest --coverage --forceExit --runInBand",
     "test:watch": "jest --watch --verbose false --forceExit --runInBand",
     "test:e2e": "nodemon -r dotenv/config src/server.ts dotenv_config_path=./.env.staging --exec ts-node src/server.ts"
