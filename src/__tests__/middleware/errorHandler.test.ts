@@ -73,6 +73,7 @@ describe('api/v1/middlewares/error_handler.ts', () => {
   })
 
   test('Error handler Middlerware with IN_PROD variable', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-extra-semi
     ;(appConfig.IN_PROD as any) = true
     const req: any = { query: { retry: null } }
     const res: any = {
