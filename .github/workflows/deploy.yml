@@ -1,8 +1,14 @@
 name: Deploy to production
 
 on:
-  push:
+  # push:
+  #   branches: [main]
+
+  workflow_run:
+    workflows: ['Testing']
     branches: [main]
+    types:
+      - completed
 
 permissions:
   id-token: write
