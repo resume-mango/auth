@@ -23,8 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS credentials
-        run: cd ..
-        echo: 'hello'
+        run: echo "Hello"
       #   uses: aws-actions/configure-aws-credentials@v1
       #   with:
       #     role-to-assume: arn:aws:iam::669525751309:role/github-actions-role
