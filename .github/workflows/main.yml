@@ -1,4 +1,4 @@
-name: Testing
+name: Test
 
 on:
   push:
@@ -11,6 +11,9 @@ concurrency:
   cancel-in-progress: true
 # env:
 #   NEXT_PUBLIC_GOOGLE_ANALYTICS: ${{ secrets.NEXT_PUBLIC_GOOGLE_ANALYTICS }}
+permissions:
+  id-token: write
+  contents: read # This is required for actions/checkout@v2
 
 jobs:
   testing:
@@ -37,3 +40,30 @@ jobs:
         env:
           NODE_OPTIONS: '--max_old_space_size=4096'
         run: npm run test
+
+  build:
+    needs: testing
+    name: Build image
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        echo: Hi
+      #   uses: aws-actions/configure-aws-credentials@v1
+      #   with:
+      #     role-to-assume: arn:aws:iam::669525751309:role/github-actions-role
+      #     aws-region: us-east-2
+
+      # - name: Login to Amazon ECR
+      #   id: login-ecr
+      #   uses: aws-actions/amazon-ecr-login@v1
+
+      # - name: Build, tag, and push docker image to Amazon ECR
+      #   env:
+      #     REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+      #     REPOSITORY: auth_service
+      #     IMAGE_TAG: ${{ github.sha }}
+      #   run: |
+      #     docker build -t $REGISTRY/$REPOSITORY:$IMAGE_TAG .
+      #     docker push $REGISTRY/$REPOSITORY:$IMAGE_TAG
