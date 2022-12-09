@@ -23,6 +23,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Configure AWS credentials
+        run: cd ..
         echo: hello
       #   uses: aws-actions/configure-aws-credentials@v1
       #   with:
