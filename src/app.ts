@@ -130,6 +130,21 @@ app.use(auth(config))
 
 app.use('/auth', RoutesV1)
 
+app.use('/health-check', (_req, res) => {
+  const healthcheck = {
+    uptime: process.uptime(),
+    processtime: process.hrtime(),
+    message: 'OK',
+    timestamp: Date.now(),
+  }
+  try {
+    res.send(healthcheck)
+  } catch (error) {
+    healthcheck.message = error
+    res.status(503).send()
+  }
+})
+
 app.use(notFound, errorHandler)
 
 process.on('uncaughtException', function (err) {
