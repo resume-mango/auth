@@ -6,4 +6,4 @@ RUN npm ci --only-production
 COPY . .
 RUN npm run build
 EXPOSE 4001
-CMD ["npm", "run", "dev"]
+CMD ["npm", "start"]
