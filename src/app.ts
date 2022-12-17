@@ -34,14 +34,12 @@ app.set('view engine', 'ejs')
 
 app.disable('x-powered-by')
 
-if (!IN_PROD) {
-  app.use(
-    cors({
-      origin: true,
-      credentials: true,
-    })
-  )
-}
+app.use(
+  cors({
+    origin: true,
+    credentials: true,
+  })
+)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
