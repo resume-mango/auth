@@ -12,6 +12,7 @@ import { auth, ConfigParams } from 'express-openid-connect'
 import { errorHandler, notFound } from './api/v1/middlewares/error_handler'
 import { IN_STAGING, IN_PROD, PORT } from './config/app'
 import csrf from 'csurf'
+import os from 'os'
 
 const app: Application = express()
 
@@ -134,6 +135,7 @@ app.use('/health-check', (_req, res) => {
     processtime: process.hrtime(),
     message: 'OK',
     timestamp: Date.now(),
+    id: os.hostname(),
   }
   try {
     res.send(healthcheck)
