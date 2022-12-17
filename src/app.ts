@@ -129,7 +129,7 @@ app.use(auth(config))
 
 app.use('/auth', RoutesV1)
 
-app.use('/health-check', (_req, res) => {
+app.use('/auth/health-check', (_req, res) => {
   const healthcheck = {
     uptime: process.uptime(),
     processtime: process.hrtime(),
