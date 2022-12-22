@@ -51,7 +51,7 @@ describe('Main Controller Apis', () => {
 
       expect(res.redirect).toBeCalledWith('http://localhost:3002/abc')
     })
-    test('Should redirect to on localhost:3000', async () => {
+    test('Should redirect to on localhost:3001 due to invalid query name', async () => {
       const syncSpy = jest.spyOn(helpers, 'syncToken')
       syncSpy.mockResolvedValueOnce(false)
       const req: any = {
@@ -68,7 +68,7 @@ describe('Main Controller Apis', () => {
       const next: any = jest.fn()
       await mainController.home(req, res, next)
 
-      expect(res.redirect).toBeCalledWith('http://localhost:3000/abc')
+      expect(res.redirect).toBeCalledWith('http://localhost:3001/abc')
     })
     test('Should redirect to on app.resumemango.com', async () => {
       Object.defineProperties(config, { IN_PROD: { value: true } })
@@ -111,7 +111,7 @@ describe('Main Controller Apis', () => {
 
       expect(res.redirect).toBeCalledWith('https://manage.resumemango.com/abc')
     })
-    test('Should redirect to on www.resumemango.com', async () => {
+    test('Should redirect to on app.resumemango.com due to invalid query', async () => {
       Object.defineProperties(config, { IN_PROD: { value: true } })
       const syncSpy = jest.spyOn(helpers, 'syncToken')
       syncSpy.mockResolvedValueOnce(false)
@@ -129,7 +129,7 @@ describe('Main Controller Apis', () => {
       const next: any = jest.fn()
       await mainController.home(req, res, next)
 
-      expect(res.redirect).toBeCalledWith('https://www.resumemango.com/abc')
+      expect(res.redirect).toBeCalledWith('https://app.resumemango.com/abc')
     })
   })
   describe('Initail Data controller', () => {
