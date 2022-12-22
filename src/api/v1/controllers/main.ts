@@ -26,14 +26,14 @@ export default {
               ? 'https://app.resumemango.com'
               : host === 'manage'
               ? 'https://manage.resumemango.com'
-              : 'https://www.resumemango.com'
+              : 'https://app.resumemango.com'
         } else {
           hostname =
             host === 'app'
               ? 'http://localhost:3001'
               : host === 'manage'
               ? 'http://localhost:3002'
-              : 'http://localhost:3000'
+              : 'http://localhost:3001'
         }
         url = hostname + path
       }
