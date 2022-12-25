@@ -9,8 +9,7 @@ on:
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
   cancel-in-progress: true
-# env:
-#   NEXT_PUBLIC_GOOGLE_ANALYTICS: ${{ secrets.NEXT_PUBLIC_GOOGLE_ANALYTICS }}
+
 permissions:
   id-token: write
   contents: read # This is required for actions/checkout@v2
@@ -57,49 +56,53 @@ jobs:
           NODE_OPTIONS: '--max_old_space_size=4096'
         run: npm run test
 
-  # build:
-  #   needs: testing
-  #   name: Deploy
-  #   runs-on: ubuntu-latest
+  build:
+    needs: testing
+    name: Deploy
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Configure AWS credentials
-  #       uses: aws-actions/configure-aws-credentials@v1
-  #       with:
-  #         role-to-assume: ${{secrets.AWS_ROLE_TO_ASSUME}}
-  #         aws-region: ${{env.AWS_REGION}}
+    steps:
+      - uses: actions/checkout@v3
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          role-to-assume: ${{secrets.AWS_ROLE_TO_ASSUME}}
+          aws-region: ${{env.AWS_REGION}}
 
-  #     - name: Login to Amazon ECR
-  #       id: login-ecr
-  #       uses: aws-actions/amazon-ecr-login@v1
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
 
-  #     - name: Build, tag, and push docker image to Amazon ECR
-  #       id: build-image
-  #       env:
-  #         IMAGE_TAG: ${{ github.sha }}
-  #       run: |
-  #         docker build -t $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG .
-  #         docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
-  #         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"
+      - name: Add Production ENV File
+        run: |
+          echo $STAGING_ENV_FILE | base64 --decode > .env
 
-  #     - name: Download Task Definition
-  #       run: |
-  #         aws ecs describe-task-definition --task-definition $ECS_TD --query taskDefinition > task-definition.json
+      - name: Build, tag, and push docker image to Amazon ECR
+        id: build-image
+        env:
+          IMAGE_TAG: ${{ github.sha }}
+        run: |
+          docker build -t $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG .
+          docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
+          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"
 
-  #     - name: Fill Image ID in ECS Task Definition
-  #       id: task-def
-  #       uses: aws-actions/amazon-ecs-render-task-definition@v1
-  #       with:
-  #         task-definition: task-definition.json
-  #         container-name: ${{env.CONTAINER_NAME}}
-  #         image: ${{ steps.build-image.outputs.image }}
+      - name: Download Task Definition
+        run: |
+          aws ecs describe-task-definition --task-definition $ECS_TD --query taskDefinition > task-definition.json
 
-  #     - name: Deploy Amazon ECS task definition
-  #       uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-  #       with:
-  #         task-definition: ${{ steps.task-def.outputs.task-definition }}
-  #         service: ${{env.ECS_SV}}
-  #         cluster: ${{env.ECS_CLUSTER}}
-  #         wait-for-service-stability: false
-  #         force-new-deployment: true
+      - name: Fill Image ID in ECS Task Definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{env.CONTAINER_NAME}}
+          image: ${{ steps.build-image.outputs.image }}
+
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{env.ECS_SV}}
+          cluster: ${{env.ECS_CLUSTER}}
+          wait-for-service-stability: false
+          force-new-deployment: true
