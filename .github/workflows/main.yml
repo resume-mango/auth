@@ -69,13 +69,13 @@ jobs:
           role-to-assume: ${{secrets.AWS_ROLE_TO_ASSUME}}
           aws-region: ${{env.AWS_REGION}}
 
+      - name: Add Production ENV File
+        run: |
+          echo $PROD_ENV_FILE | base64 --decode > .env.production
+
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
-
-      - name: Add Production ENV File
-        run: |
-          echo $STAGING_ENV_FILE | base64 --decode > .env.production
 
       - name: Build, tag, and push docker image to Amazon ECR
         id: build-image
