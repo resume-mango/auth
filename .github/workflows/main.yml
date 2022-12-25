@@ -40,7 +40,7 @@ jobs:
 
       - name: Add Staging ENV File
         run: |
-          echo $STAGING_ENV_FILE | base64 --decode > .env
+          echo $STAGING_ENV_FILE | base64 --decode > .env.staging
 
       - name: Install dependencies
         run: npm install
@@ -75,7 +75,7 @@ jobs:
 
       - name: Add Production ENV File
         run: |
-          echo $STAGING_ENV_FILE | base64 --decode > .env
+          echo $STAGING_ENV_FILE | base64 --decode > .env.production
 
       - name: Build, tag, and push docker image to Amazon ECR
         id: build-image
