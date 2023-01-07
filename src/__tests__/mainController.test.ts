@@ -2,7 +2,6 @@
 // import authService from 'express-openid-connect'
 import * as helpers from '../api/v1/helpers/user'
 // import { auth0Token } from '../../__mocks__/token'
-import * as config from '../config/app'
 import mainController from '../api/v1/controllers/main'
 import { fakeUser } from '../__mocks__/auth0User'
 
@@ -69,67 +68,6 @@ describe('Main Controller Apis', () => {
       await mainController.home(req, res, next)
 
       expect(res.redirect).toBeCalledWith('http://localhost:3001/abc')
-    })
-    test('Should redirect to on app.resumemango.com', async () => {
-      Object.defineProperties(config, { IN_PROD: { value: true } })
-      const syncSpy = jest.spyOn(helpers, 'syncToken')
-      syncSpy.mockResolvedValueOnce(false)
-
-      const req: any = {
-        query: {
-          rm_name: 'app',
-          rm_path: '/abc',
-        },
-        oidc: {
-          accessToken: { access_token: 'token' },
-        },
-        cookies: { SID: 'snxnz' },
-      }
-      const res: any = { redirect: jest.fn() }
-      const next: any = jest.fn()
-      await mainController.home(req, res, next)
-
-      expect(res.redirect).toBeCalledWith('https://app.resumemango.com/abc')
-    })
-    test('Should redirect to on manage.resumemango.com', async () => {
-      Object.defineProperties(config, { IN_PROD: { value: true } })
-      const syncSpy = jest.spyOn(helpers, 'syncToken')
-      syncSpy.mockResolvedValueOnce(false)
-      const req: any = {
-        query: {
-          rm_name: 'manage',
-          rm_path: '/abc',
-        },
-        oidc: {
-          accessToken: { access_token: 'token' },
-        },
-        cookies: { SID: 'snxnz' },
-      }
-      const res: any = { redirect: jest.fn() }
-      const next: any = jest.fn()
-      await mainController.home(req, res, next)
-
-      expect(res.redirect).toBeCalledWith('https://manage.resumemango.com/abc')
-    })
-    test('Should redirect to on app.resumemango.com due to invalid query', async () => {
-      Object.defineProperties(config, { IN_PROD: { value: true } })
-      const syncSpy = jest.spyOn(helpers, 'syncToken')
-      syncSpy.mockResolvedValueOnce(false)
-      const req: any = {
-        query: {
-          rm_name: 'asd',
-          rm_path: '/abc',
-        },
-        oidc: {
-          accessToken: { access_token: 'token' },
-        },
-        cookies: { SID: 'snxnz' },
-      }
-      const res: any = { redirect: jest.fn() }
-      const next: any = jest.fn()
-      await mainController.home(req, res, next)
-
-      expect(res.redirect).toBeCalledWith('https://app.resumemango.com/abc')
     })
   })
   describe('Initail Data controller', () => {

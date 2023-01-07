@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import createHttpError from 'http-errors'
-import { IN_PROD } from '../../../config/app'
 import { parseUser, syncToken, updateUserRef } from '../helpers/user'
-// import '../../../views/loader'
 export default {
   home: async (
     req: Request,
@@ -20,26 +18,17 @@ export default {
       SID && (await syncToken(token as string, SID))
 
       if (path && host) {
-        if (IN_PROD) {
-          hostname =
-            host === 'app'
-              ? 'https://app.resumemango.com'
-              : host === 'manage'
-              ? 'https://manage.resumemango.com'
-              : 'https://app.resumemango.com'
-        } else {
-          hostname =
-            host === 'app'
-              ? 'http://localhost:3001'
-              : host === 'manage'
-              ? 'http://localhost:3002'
-              : 'http://localhost:3001'
-        }
+        hostname =
+          host === 'app'
+            ? process.env.USERDASH_HOST
+            : host === 'manage'
+            ? process.env.MANAGEMENT_HOST
+            : process.env.USERDASH_HOST
         url = hostname + path
+      } else {
+        url = process.env.USERDASH_HOST
       }
       res.redirect(url as string)
-      // res.setHeader('Content-Security-Policy', "script-src 'unsafe-inline';")
-      // res.render('loader', { url })
     } catch (err) {
       next(err)
     }

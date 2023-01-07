@@ -17,6 +17,7 @@ describe('User Helper', () => {
       const result = parseUser(user)
       expect(result).toEqual({
         firstName: user.nickname,
+        id: user.sub,
         lastName: '',
         ref: '',
         role: user[namespace].role,
@@ -30,6 +31,8 @@ describe('User Helper', () => {
       expect(result).toEqual({
         firstName: user.given_name,
         lastName: user.family_name,
+        id: user.sub,
+
         ref: '',
         role: user[namespace].role,
       })
@@ -39,6 +42,8 @@ describe('User Helper', () => {
       user.sub = 'google|acb'
       const result = parseUser(user)
       expect(result).toEqual({
+        id: user.sub,
+
         firstName: user[namespace].user_metadata.firstName,
         lastName: user[namespace].user_metadata.lastName,
         ref: '',

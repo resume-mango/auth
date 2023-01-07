@@ -13,6 +13,7 @@ import { errorHandler, notFound } from './api/v1/middlewares/error_handler'
 import { IN_STAGING, IN_PROD, PORT } from './config/app'
 import csrf from 'csurf'
 import os from 'os'
+import { emailVerify } from './api/v1/middlewares/emailVerify'
 
 const app: Application = express()
 
@@ -145,7 +146,7 @@ app.use('/auth/health-check', (_req, res) => {
   }
 })
 
-app.use(notFound, errorHandler)
+app.use(emailVerify, notFound, errorHandler)
 
 process.on('uncaughtException', function (err) {
   console.error(err)

@@ -24,9 +24,9 @@ export const parseUser = (user: Record<string, any>) => {
       lastName = user.family_name
     }
   }
-
   const ref = appMetadata.ref || ''
   return {
+    id: user.sub,
     role,
     firstName,
     lastName,
