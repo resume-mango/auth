@@ -14,8 +14,27 @@ import { IN_STAGING, IN_PROD, PORT } from './config/app'
 import csrf from 'csurf'
 import os from 'os'
 import { emailVerify } from './api/v1/middlewares/emailVerify'
+import * as Sentry from '@sentry/node'
+import * as Tracing from '@sentry/tracing'
 
 const app: Application = express()
+
+Sentry.init({
+  dsn: process.env.SENTRY_DSN,
+  integrations: [
+    // enable HTTP calls tracing
+    new Sentry.Integrations.Http({ tracing: true }),
+    // enable Express.js middleware tracing
+    new Tracing.Integrations.Express({ app }),
+    // Automatically instrument Node.js libraries and frameworks
+    ...Sentry.autoDiscoverNodePerformanceMonitoringIntegrations(),
+  ],
+
+  // Set tracesSampleRate to 1.0 to capture 100%
+  // of transactions for performance monitoring.
+  // We recommend adjusting this value in production
+  tracesSampleRate: 1.0,
+})
 
 const csrfProtection = csrf({
   cookie: {
@@ -36,6 +55,12 @@ app.set('view engine', 'ejs')
 
 app.disable('x-powered-by')
 
+// RequestHandler creates a separate execution context using domains, so that every
+// transaction/span/breadcrumb is attached to its own Hub instance
+app.use(Sentry.Handlers.requestHandler())
+// TracingHandler creates a trace for every incoming request
+app.use(Sentry.Handlers.tracingHandler())
+
 app.use(
   cors({
     origin: true,
@@ -53,6 +78,7 @@ app.use(
     crossOriginResourcePolicy: false,
   })
 )
+
 if (!IN_STAGING) {
   app.set('trust proxy', ['loopback', 'linklocal', 'uniquelocal'])
 
@@ -146,7 +172,7 @@ app.use('/auth/health-check', (_req, res) => {
   }
 })
 
-app.use(emailVerify, notFound, errorHandler)
+app.use(emailVerify, notFound, Sentry.Handlers.errorHandler(), errorHandler)
 
 process.on('uncaughtException', function (err) {
   console.error(err)

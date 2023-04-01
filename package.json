@@ -6,6 +6,7 @@
   "scripts": {
     "start": "node ./build/bundle.js",
     "lint": "tsc --noEmit && eslint . --ext .ts",
+    "set-repo-secrets": "sh gen_env_vars.sh",
     "dev": "nodemon -r dotenv/config src/server.ts dotenv_config_path=./.env.development --exec ts-node src/server.ts",
     "dev:build": "webpack --config ./webpack/webpack.config.js --env NODE_ENV=development",
     "dev:watch": "nodemon ./build/bundle.js --watch build",
@@ -18,6 +19,8 @@
   "author": "Kundan  Bhosale",
   "license": "ISC",
   "dependencies": {
+    "@sentry/node": "^7.46.0",
+    "@sentry/tracing": "^7.46.0",
     "axios": "^0.23.0",
     "chalk": "^4.1.2",
     "connect-redis": "^6.1.3",
