@@ -5,4 +5,4 @@ COPY package*.json ./
 RUN npm ci --only-production
 COPY . .
 RUN npm run build
-CMD ["./build/bundle.js"]
+CMD ["./build/bundle.handler"]
