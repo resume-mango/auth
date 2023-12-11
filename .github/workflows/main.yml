@@ -2,7 +2,7 @@ name: Auth CI/CD
 
 on:
   push:
-    branches: ['main']
+    branches: ["main"]
 
   workflow_dispatch:
 
@@ -36,7 +36,7 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 16.18.1
-          cache: 'npm'
+          cache: "npm"
 
       - name: Add Staging ENV File
         run: |
@@ -53,7 +53,7 @@ jobs:
 
       - name: Tests Project
         env:
-          NODE_OPTIONS: '--max_old_space_size=4096'
+          NODE_OPTIONS: "--max_old_space_size=4096"
         run: npm run test
 
   build:
@@ -80,7 +80,7 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR
         id: build-image
         env:
-          IMAGE_TAG: ${{ github.sha }}
+          IMAGE_TAG: latest
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
