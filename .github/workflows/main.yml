@@ -17,11 +17,11 @@ permissions:
 env:
   AWS_REGION: us-east-2
   ECR_REGISTRY: 669525751309.dkr.ecr.us-east-2.amazonaws.com
-  ECR_REPO: resumemango-auth-service
-  ECS_CLUSTER: resumemango-cluster
-  ECS_TD: resumemango-auth-td
-  ECS_SV: resumemango-auth-sv
-  CONTAINER_NAME: resumemango-auth-container
+  ECR_REPO: career-auth-service
+  ECS_CLUSTER: career-cluster
+  ECS_TD: career-auth-td
+  ECS_SV: career-auth-sv
+  CONTAINER_NAME: career-auth-container
   PROD_ENV_FILE: ${{ secrets.PROD_ENV_BASE_64 }}
   DEV_ENV_FILE: ${{ secrets.DEV_ENV_BASE_64 }}
   STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_BASE_64 }}
@@ -80,29 +80,29 @@ jobs:
       - name: Build, tag, and push docker image to Amazon ECR
         id: build-image
         env:
-          IMAGE_TAG: latest
+          IMAGE_TAG: ${{ github.sha }}
         run: |
           docker build -t $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
           echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"
 
-      # - name: Download Task Definition
-      #   run: |
-      #     aws ecs describe-task-definition --task-definition $ECS_TD --query taskDefinition > task-definition.json
+      - name: Download Task Definition
+        run: |
+          aws ecs describe-task-definition --task-definition $ECS_TD --query taskDefinition > task-definition.json
 
-      # - name: Fill Image ID in ECS Task Definition
-      #   id: task-def
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: task-definition.json
-      #     container-name: ${{env.CONTAINER_NAME}}
-      #     image: ${{ steps.build-image.outputs.image }}
+      - name: Fill Image ID in ECS Task Definition
+        id: task-def
+        uses: aws-actions/amazon-ecs-render-task-definition@v1
+        with:
+          task-definition: task-definition.json
+          container-name: ${{env.CONTAINER_NAME}}
+          image: ${{ steps.build-image.outputs.image }}
 
-      # - name: Deploy Amazon ECS task definition
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{env.ECS_SV}}
-      #     cluster: ${{env.ECS_CLUSTER}}
-      #     wait-for-service-stability: false
-      #     force-new-deployment: true
+      - name: Deploy Amazon ECS task definition
+        uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+        with:
+          task-definition: ${{ steps.task-def.outputs.task-definition }}
+          service: ${{env.ECS_SV}}
+          cluster: ${{env.ECS_CLUSTER}}
+          wait-for-service-stability: false
+          force-new-deployment: true
