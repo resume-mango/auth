@@ -12,4 +12,4 @@ const handler = async () => {
   }
 }
 
-handler()
+export const viteNodeApp = handler()

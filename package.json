@@ -2,7 +2,7 @@
   "name": "auth",
   "version": "1.0.0",
   "description": "Authorization server - Openid connect protocol",
-  "main": "server.js",
+  "main": "server.ts",
   "scripts": {
     "start": "node ./build/bundle.js",
     "lint": "tsc --noEmit && eslint . --ext .ts",
