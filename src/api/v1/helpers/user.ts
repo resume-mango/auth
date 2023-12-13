@@ -1,14 +1,13 @@
-import axios from 'axios'
+import axios from "axios"
 /**
  * Parse User object
  * @param user decoded user data
  * @returns { role, firstName, lastName, ref}
  */
 export const parseUser = (user: Record<string, any>) => {
-  let firstName = ''
-  let lastName = ''
+  let firstName = ""
+  let lastName = ""
   const namespace = process.env.AUTH0_RULES_NAMESPACE as string
-
   const userMetadata = user && user[namespace].user_metadata
   const appMetadata = user && user[namespace].app_metadata
   const role = (user && user[namespace].role) || null
@@ -17,14 +16,14 @@ export const parseUser = (user: Record<string, any>) => {
     firstName = userMetadata.firstName
     lastName = userMetadata.lastName
   } else {
-    if (user.sub.split('|')[0] === 'auth0') {
+    if (user.sub.split("|")[0] === "auth0") {
       firstName = user.nickname
     } else {
       firstName = user.given_name
       lastName = user.family_name
     }
   }
-  const ref = appMetadata.ref || ''
+  const ref = appMetadata.ref || ""
   return {
     id: user.sub,
     role,
@@ -42,21 +41,21 @@ export const parseUser = (user: Record<string, any>) => {
 export const syncToken = async (token: string, SID: string) =>
   await axios
     .request({
-      method: 'PATCH',
+      method: "PATCH",
       url: `${process.env.API_HOST}/v1/m2m/user/sid`,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         Cookie: `SID=${SID};`,
       },
       withCredentials: true,
     })
     .then(async (_res) => {
-      console.log('synced')
+      console.log("synced")
       return true
     })
     .catch((_err) => {
-      console.log('failed to sync session ID!')
+      console.log("failed to sync session ID!")
       return false
     })
 
@@ -74,10 +73,10 @@ export const updateUserRef = async (
 ) =>
   await axios
     .request({
-      method: 'POST',
+      method: "POST",
       url: `${process.env.API_HOST}/v1/m2m/user`,
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
         Cookie: `SID=${SID};`,
       },
