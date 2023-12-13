@@ -27,34 +27,34 @@ env:
   STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_BASE_64 }}
 
 jobs:
-  # testing:
-  #   runs-on: ubuntu-latest
+  testing:
+    runs-on: ubuntu-latest
 
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #     - name: Use Node.js 16.18.1
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 16.18.1
-  #         cache: "npm"
+    steps:
+      - uses: actions/checkout@v3
+      - name: Use Node.js 16.18.1
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16.18.1
+          cache: "npm"
 
-  #     - name: Add Staging ENV File
-  #       run: |
-  #         echo $STAGING_ENV_FILE | base64 --decode > .env.staging
+      - name: Add Staging ENV File
+        run: |
+          echo $STAGING_ENV_FILE | base64 --decode > .env.staging
 
-  #     - name: Install dependencies
-  #       run: npm install
+      - name: Install dependencies
+        run: npm install
 
-  #     - name: Lints Project
-  #       run: npm run lint
+      - name: Lints Project
+        run: npm run lint
 
-  #     - name: Start Redis
-  #       uses: supercharge/redis-github-action@1.4.0
+      - name: Start Redis
+        uses: supercharge/redis-github-action@1.4.0
 
-  #     - name: Tests Project
-  #       env:
-  #         NODE_OPTIONS: "--max_old_space_size=4096"
-  #       run: npm run test
+      - name: Tests Project
+        env:
+          NODE_OPTIONS: "--max_old_space_size=4096"
+        run: npm run test
 
   build:
     # needs: testing

@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from 'express'
-import createHttpError from 'http-errors'
+import { Request, Response, NextFunction } from "express"
+import createHttpError from "http-errors"
 // import { IN_PROD } from '../../../config/app'
 
 export default {
@@ -11,9 +11,9 @@ export default {
     try {
       const path = req.query.rm_path?.toString()
       const host = req.query.rm_name?.toString()
-      const screen = req.query.screen?.toString() || ''
+      const screen = req.query.screen?.toString() || ""
       const redirectUrl =
-        host && path ? `/auth?rm_name=${host}&rm_path=${path}` : '/auth'
+        host && path ? `/?rm_name=${host}&rm_path=${path}` : "/"
 
       res.oidc.login({
         returnTo: redirectUrl,
@@ -33,10 +33,10 @@ export default {
   ): Promise<any> => {
     try {
       if (!req.oidc.isAuthenticated())
-        throw new createHttpError.Unauthorized('Not logged in')
+        throw new createHttpError.Unauthorized("Not logged in")
       res.oidc.logout({ returnTo: process.env.BASE_HOST })
-      res.clearCookie('rm_ia', {
-        path: '/',
+      res.clearCookie("rm_ia", {
+        path: "/",
         domain: process.env.COOKIE_DOMAIN,
       })
     } catch (err) {

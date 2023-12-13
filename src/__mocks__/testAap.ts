@@ -1,19 +1,19 @@
-import express, { Application } from 'express'
-import cors from 'cors'
-import helmet from 'helmet'
-import rateLimit from 'express-rate-limit'
-import RoutesV1 from '../api/v1/routes'
-import cookieParser from 'cookie-parser'
-import morgan from 'morgan'
-import path from 'path'
-import { errorHandler, notFound } from '../api/v1/middlewares/error_handler'
-import { IN_PROD } from '../config/app'
+import express, { Application } from "express"
+import cors from "cors"
+import helmet from "helmet"
+import rateLimit from "express-rate-limit"
+import RoutesV1 from "../api/v1/routes"
+import cookieParser from "cookie-parser"
+import morgan from "morgan"
+import path from "path"
+import { errorHandler, notFound } from "../api/v1/middlewares/error_handler"
+import { IN_PROD } from "../config/app"
 
 const app: Application = express()
-app.set('views', path.join(__dirname, 'views'))
-app.set('view engine', 'ejs')
+app.set("views", path.join(__dirname, "views"))
+app.set("view engine", "ejs")
 
-app.disable('x-powered-by')
+app.disable("x-powered-by")
 if (!IN_PROD) {
   app.use(
     cors({
@@ -26,7 +26,7 @@ if (!IN_PROD) {
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
-app.use(morgan('dev'))
+app.use(morgan("dev"))
 
 app.use(
   helmet({
@@ -41,13 +41,13 @@ const apiRequestLimiter = rateLimit({
 
 app.use(apiRequestLimiter)
 
-app.use('/auth', RoutesV1)
+app.use("/", RoutesV1)
 
 app.use(notFound, errorHandler)
 
-process.on('uncaughtException', function (err) {
+process.on("uncaughtException", function (err) {
   console.error(err)
-  console.log('Node NOT Exiting...')
+  console.log("Node NOT Exiting...")
 })
 
 export default app
