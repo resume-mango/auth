@@ -22,9 +22,9 @@ env:
   ECS_TD: careermango-auth-td
   ECS_SV: careermango-auth-sv
   CONTAINER_NAME: careermango-auth-container
-  PROD_ENV_FILE: ${{ secrets.PROD_ENV_BASE_64 }}
-  DEV_ENV_FILE: ${{ secrets.DEV_ENV_BASE_64 }}
-  STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_BASE_64 }}
+  PROD_ENV_FILE: ${{ secrets.PROD_ENV_AUTH_SERVICE_BASE_64 }}
+  DEV_ENV_FILE: ${{ secrets.DEV_ENV_AUTH_SERVICE_BASE_64 }}
+  STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_AUTH_SERVICE_BASE_64 }}
 
 jobs:
   testing:
