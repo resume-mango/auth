@@ -1,30 +1,15 @@
-import chalk from 'chalk'
-import Redis, { RedisOptions } from 'ioredis'
-import { IN_PROD } from './app'
+import chalk from "chalk"
+import Redis from "ioredis"
 
-const HOST = !IN_PROD ? 'localhost' : process.env.REDIS_HOST
+const URL = process.env.REDIS_URL
 
-const REDIS_OPTIONS: RedisOptions = {
-  port: Number(process.env.REDIS_PORT),
-  host: HOST,
-  // password: REDIS_PASSWORD
-}
+const redisClient = new Redis(URL)
 
-const redisClient = new Redis(REDIS_OPTIONS)
-
-redisClient.on('connect', () =>
-  console.log(
-    chalk.yellow.bold(
-      `Redis connected on ${HOST}:${Number(process.env.REDIS_PORT)}`
-    )
-  )
+redisClient.on("connect", () =>
+  console.log(chalk.yellow.bold(`Redis connected on ${URL}`))
 )
-redisClient.on('error', () =>
-  console.log(
-    chalk.red.bold(
-      `Redis failed to connect on ${HOST}:${Number(process.env.REDIS_PORT)}`
-    )
-  )
+redisClient.on("error", () =>
+  console.log(chalk.red.bold(`Redis failed to connect on ${URL}`))
 )
 
 export { redisClient }
