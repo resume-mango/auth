@@ -19,7 +19,6 @@ describe('User Helper', () => {
                 firstName: user.nickname,
                 id: user.sub,
                 lastName: '',
-                ref: '',
                 role: user[namespace].role,
             })
         })
@@ -32,8 +31,6 @@ describe('User Helper', () => {
                 firstName: user.given_name,
                 lastName: user.family_name,
                 id: user.sub,
-
-                ref: '',
                 role: user[namespace].role,
             })
         })
@@ -43,10 +40,8 @@ describe('User Helper', () => {
             const result = parseUser(user)
             expect(result).toEqual({
                 id: user.sub,
-
                 firstName: user[namespace].user_metadata.firstName,
                 lastName: user[namespace].user_metadata.lastName,
-                ref: '',
                 role: user[namespace].role,
             })
         })
@@ -128,7 +123,7 @@ describe('User Helper', () => {
                     Cookie: 'SID=efg;',
                 },
             })
-            expect(result).toEqual('efg')
+            expect(result).toEqual(null)
         })
     })
 })
