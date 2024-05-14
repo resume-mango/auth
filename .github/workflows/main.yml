@@ -1,124 +1,124 @@
 name: Auth CI/CD
 
 on:
-  push:
-    branches: ["main"]
+    push:
+        branches: ['main']
 
-  workflow_dispatch:
+    workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
+    group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+    cancel-in-progress: true
 
 permissions:
-  id-token: write
-  contents: read # This is required for actions/checkout@v2
+    id-token: write
+    contents: read # This is required for actions/checkout@v2
 
 env:
-  AWS_REGION: us-east-2
-  ECR_REGISTRY: 669525751309.dkr.ecr.us-east-2.amazonaws.com
-  ECR_REPO: careermango-auth-service
-  ECS_CLUSTER: careermango-cluster
-  ECS_TD: careermango-auth-td
-  SERVICE_NAME: careermango-auth-sv
-  CONTAINER_NAME: careermango-auth-container
-  PROD_ENV_FILE: ${{ secrets.PROD_ENV_AUTH_SERVICE_BASE_64 }}
-  DEV_ENV_FILE: ${{ secrets.DEV_ENV_AUTH_SERVICE_BASE_64 }}
-  STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_AUTH_SERVICE_BASE_64 }}
+    AWS_REGION: us-east-2
+    ECR_REGISTRY: 669525751309.dkr.ecr.us-east-2.amazonaws.com
+    ECR_REPO: careermango-auth-service
+    ECS_CLUSTER: careermango-cluster
+    ECS_TD: careermango-auth-td
+    SERVICE_NAME: careermango-auth-sv
+    CONTAINER_NAME: careermango-auth-container
+    PROD_ENV_FILE: ${{ secrets.PROD_ENV_AUTH_SERVICE_BASE_64 }}
+    DEV_ENV_FILE: ${{ secrets.DEV_ENV_AUTH_SERVICE_BASE_64 }}
+    STAGING_ENV_FILE: ${{ secrets.STAGING_ENV_AUTH_SERVICE_BASE_64 }}
 
 jobs:
-  testing:
-    runs-on: ubuntu-latest
+    testing:
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Use Node.js 16.18.1
-        uses: actions/setup-node@v3
-        with:
-          node-version: 16.18.1
-          cache: "npm"
+        steps:
+            - uses: actions/checkout@v3
+            - name: Use Node.js 16.18.1
+              uses: actions/setup-node@v3
+              with:
+                  node-version: 16.18.1
+                  cache: 'npm'
 
-      - name: Add Staging ENV File
-        run: |
-          echo $STAGING_ENV_FILE | base64 --decode > .env.staging
+            - name: Add Staging ENV File
+              run: |
+                  echo $STAGING_ENV_FILE | base64 --decode > .env.staging
 
-      - name: Install dependencies
-        run: npm install
+            - name: Install dependencies
+              run: npm install
 
-      - name: Lints Project
-        run: npm run lint
+            - name: Lints Project
+              run: npm run lint
 
-      - name: Start Redis
-        uses: supercharge/redis-github-action@1.4.0
+            - name: Start Redis
+              uses: supercharge/redis-github-action@1.4.0
 
-      - name: Tests Project
-        env:
-          NODE_OPTIONS: "--max_old_space_size=4096"
-        run: npm run test
+            - name: Tests Project
+              env:
+                  NODE_OPTIONS: '--max_old_space_size=4096'
+              run: npm run test
 
-  build:
-    # needs: testing
-    name: Deploy
-    runs-on: ubuntu-latest
+    build:
+        # needs: testing
+        name: Deploy
+        runs-on: ubuntu-latest
 
-    steps:
-      - uses: actions/checkout@v3
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          role-to-assume: ${{secrets.AWS_ROLE_TO_ASSUME}}
-          aws-region: ${{env.AWS_REGION}}
+        steps:
+            - uses: actions/checkout@v3
+            - name: Configure AWS credentials
+              uses: aws-actions/configure-aws-credentials@v1
+              with:
+                  role-to-assume: ${{secrets.AWS_ROLE_TO_ASSUME}}
+                  aws-region: ${{env.AWS_REGION}}
 
-      - name: Add Production ENV File
-        run: |
-          echo $PROD_ENV_FILE | base64 --decode > .env.production
+            - name: Add Production ENV File
+              run: |
+                  echo $PROD_ENV_FILE | base64 --decode > .env.production
 
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+            - name: Login to Amazon ECR
+              id: login-ecr
+              uses: aws-actions/amazon-ecr-login@v1
 
-      - name: Build, tag, and push docker image to Amazon ECR
-        id: build-image
-        env:
-          IMAGE_TAG: ${{ github.sha }}
-        run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG .
-          docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"
+            - name: Build, tag, and push docker image to Amazon ECR
+              id: build-image
+              env:
+                  IMAGE_TAG: ${{ github.sha }}
+              run: |
+                  docker build -t $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG .
+                  docker push $ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG
+                  echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPO:$IMAGE_TAG"
 
-        - name: Deploy to App Runner
-          id: deploy-apprunner
-          uses: awslabs/amazon-app-runner-deploy@main
-          with:
-              service: ${{env.SERVICE_NAME}}
-              image: ${{ steps.build-image.outputs.image }}
-              access-role-arn: ${{ secrets.ROLE_ARN }}
-              runtime: NODEJS_18
-              region: ${{ env.AWS_REGION }}
-              cpu: 0.5
-              memory: 1
-              port: 4001
-              wait-for-service-stability: true
+            - name: Deploy to App Runner
+              id: deploy-apprunner
+              uses: awslabs/amazon-app-runner-deploy@main
+              with:
+                  service: ${{env.SERVICE_NAME}}
+                  image: ${{ steps.build-image.outputs.image }}
+                  access-role-arn: ${{ secrets.ROLE_ARN }}
+                  runtime: NODEJS_18
+                  region: ${{ env.AWS_REGION }}
+                  cpu: 0.5
+                  memory: 1
+                  port: 4001
+                  wait-for-service-stability: true
 
-        - name: App Runner output
-          run: echo "App runner output ${{ steps.deploy-apprunner.outputs.service-id }}"          
-      # - name: Download Task Definition
-      #   run: |
-      #     aws ecs describe-task-definition --task-definition $ECS_TD --query taskDefinition > task-definition.json
+            - name: App Runner output
+              run: echo "App runner output ${{ steps.deploy-apprunner.outputs.service-id }}"
+            # - name: Download Task Definition
+            #   run: |
+            #     aws ecs describe-task-definition --task-definition $ECS_TD --query taskDefinition > task-definition.json
 
-      # - name: Fill Image ID in ECS Task Definition
-      #   id: task-def
-      #   uses: aws-actions/amazon-ecs-render-task-definition@v1
-      #   with:
-      #     task-definition: task-definition.json
-      #     container-name: ${{env.CONTAINER_NAME}}
-      #     image: ${{ steps.build-image.outputs.image }}
+            # - name: Fill Image ID in ECS Task Definition
+            #   id: task-def
+            #   uses: aws-actions/amazon-ecs-render-task-definition@v1
+            #   with:
+            #     task-definition: task-definition.json
+            #     container-name: ${{env.CONTAINER_NAME}}
+            #     image: ${{ steps.build-image.outputs.image }}
 
-      # - name: Deploy Amazon ECS task definition
-      #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      #   with:
-      #     task-definition: ${{ steps.task-def.outputs.task-definition }}
-      #     service: ${{env.SERVICE_NAME}}
-      #     cluster: ${{env.ECS_CLUSTER}}
-      #     wait-for-service-stability: false
-      #     force-new-deployment: true
+            # - name: Deploy Amazon ECS task definition
+            #   uses: aws-actions/amazon-ecs-deploy-task-definition@v1
+            #   with:
+            #     task-definition: ${{ steps.task-def.outputs.task-definition }}
+            #     service: ${{env.SERVICE_NAME}}
+            #     cluster: ${{env.ECS_CLUSTER}}
+            #     wait-for-service-stability: false
+            #     force-new-deployment: true
